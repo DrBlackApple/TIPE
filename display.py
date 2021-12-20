@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
+import header as h
 
 class CallbackDisplay(keras.callbacks.Callback):
 
@@ -34,3 +35,11 @@ class CallbackDisplay(keras.callbacks.Callback):
         self.ax2.legend()
         self.ax1.legend(loc='upper left')
         plt.show()
+
+
+def show(hist:h.keras.callbacks.History):
+    fig, ax = plt.subplots(1,1)
+    ax.plot(hist.history['loss'], label='Loss')
+    ax.plot(hist.history['accuracy'], label='Accuracy')
+    ax.legend()
+    plt.show()

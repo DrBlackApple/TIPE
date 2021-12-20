@@ -7,9 +7,10 @@ def euclidian_distance(y_true, y_pred):
 """
     ########### Modèle ############
 """
+
 N_EPOCH = 30
 model = h.keras.Sequential([
-    h.keras.layers.Dense(500,input_shape=(12, 1000)),
+    h.keras.layers.Dense(500,input_shape=(h.metas[0]['n_sig'], h.metas[0]['sig_len'])),
     h.keras.layers.BatchNormalization(),
     h.keras.layers.Dropout(0.2),
     h.keras.layers.Dense(128, activation='relu'),

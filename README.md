@@ -12,6 +12,8 @@ Développer un résaux de neurones afin de diagnostiquer une Electrocardiogramme
 On utilise la [PTBXL](https://physionet.org/content/ptb-xl/1.0.1/) contenant plus de 20000 ECG associé à un diagnostique.
 Les ECG sont normalisés entre 0 et 1. Chaque modèle les traitera différemment.
 
+Il faut télécharger la base est l'extraire dans un dossier `data/`.
+
 # Modèles :
 
 ## 1) Linéaire

@@ -101,7 +101,7 @@ def normalize(samples:np.array, metas:np.array, save_dir='cache/', use_existing=
     return samples
 
 def collectData(db_dir, samples_file, metas_file, y_file, use_saved=True):
-    """Charge les données à partir de celle sauvergardé ou en les créant
+    """Charge les données à partir de celles sauvergardés ou en les créant
 
     Args:
         db_dir (str): dossier de la base de donnée
