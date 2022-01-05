@@ -41,7 +41,7 @@ def loadStatement(csv:str):
     df = pd.read_csv(csv, index_col=None)
     return df
 
-def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='cache/') -> np.array:
+def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='cache/', use_only_diag=True) -> np.array:
     """One-hot encode les diagnostics -> un vecteur de dimension 71 pour chaque diag
         Sauvergarde l'encodeur pour décoder la prédiction
 
@@ -56,6 +56,9 @@ def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='cache/') -> 
     if os.path.exists(save_dir) == False:
         os.mkdir(save_dir)
 
+    if use_only_diag:
+        statement = statement[statement.diagnostic == 1]
+
     enc = OneHotEncoder()
     labels = statement['code'].to_numpy()
     enc.fit(labels.reshape(-1, 1))
@@ -64,9 +67,10 @@ def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='cache/') -> 
 
     Y = []
     for codes in db.scp_codes:
-        tmp = np.zeros(enc.n_features_in_)
+        tmp = np.zeros(len(labels))
         for key in codes.keys():
-            tmp = np.add(tmp, (enc.transform([[key]]).toarray() * codes[key] / 100)[0])
+            if key in labels:
+                tmp = np.add(tmp, enc.transform([[key]]).toarray()[0] * codes[key] / 100)
         Y.append(tmp)
 
     return np.array(Y)
@@ -126,7 +130,7 @@ def collectData(db_dir, samples_file, metas_file, y_file, use_saved=True):
     else:
         print('Création des données ', end='', flush=True)
         samples, metas = loadSample('data/', db)
-        samples = normalize(samples, metas)
+        #samples = normalize(samples, metas)
         Y = createYArray(stat, db)
 
         joblib.dump(samples, samples_file, compress=3)

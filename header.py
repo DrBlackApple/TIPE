@@ -4,7 +4,7 @@ import numpy as np
 import databuilder as dbld
 import joblib
 import display
-from tensorflow.keras.layers import Dense, Input, Conv1D, Dropout, Softmax, Concatenate, concatenate
+from tensorflow.keras.layers import Dense, Input, Conv1D, Dropout, Softmax, Concatenate, concatenate, Flatten
 from tensorflow.keras import Model
 
 USE_SAVED = True
@@ -20,3 +20,5 @@ samples, Y, metas = dbld.collectData('data/', SAMPLES_FILE, METAS_FILE, Y_FILE)
 cut = int(len(samples)*PERCENT)
 X_train, X_test = samples[:cut], samples[cut:]
 Y_train, Y_test = Y[:cut], Y[cut:]
+
+print(Y_train[:2])

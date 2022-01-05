@@ -37,9 +37,16 @@ class CallbackDisplay(keras.callbacks.Callback):
         plt.show()
 
 
-def show(hist:h.keras.callbacks.History):
+def showHistory(hist:h.keras.callbacks.History, save=True):
     fig, ax = plt.subplots(1,1)
     ax.plot(hist.history['loss'], label='Loss')
     ax.plot(hist.history['accuracy'], label='Accuracy')
     ax.legend()
+    plt.show()
+
+def showECG(ecg:h.np.ndarray, meta:dict):
+    fig, axs = plt.subplots(meta['n_sig'], sharex=True, sharey=True)
+    for i in range(meta['n_sig']):
+        axs[i].plot(ecg[i], 'r-')
+        axs[i].set_title(meta['sig_name'][i])
     plt.show()
