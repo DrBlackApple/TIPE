@@ -1,0 +1,23 @@
+Evaluate : [4.791718482971191, 0.3374541997909546]
+
+Très mauvais réseau, pas de généralisation
+Biais dans le réseau tout est a 50%/50%
+le modèle surapprend ! val_accuracy diminue puis réaugmente.
+Peut se comprendre intuitivement : à chaque valeur on lui associe un poid, mais cette valeures peut-être décalée
+On pourrait traiter le graph avant mais pas intéressant
+
+Best :
+1: OTHER/{'NORM': 100.0, 'LVOLT': 0.0, 'SR': 0.0} ([0.5029026  0.51104057])
+2: OTHER/{'NORM': 80.0, 'SBRAD': 0.0} ([0.36068234 0.5401744 ])
+3: OTHER/{'NORM': 100.0, 'SR': 0.0} ([0.488166  0.5079731])
+4: OTHER/{'NORM': 100.0, 'SR': 0.0} ([0.29444617 0.6036124 ])
+21300: OTHER/{'LAFB': 100.0, 'NST_': 100.0, 'AFIB': 0.0} ([0.21430367 0.68672   ])
+21301: OTHER/{'ASMI': 50.0, 'ABQRS': 0.0, 'SR': 0.0} ([0.42876282 0.64229465])
+
+Final :
+1: NORM/{'NORM': 100.0, 'LVOLT': 0.0, 'SR': 0.0} ([0.9972967  0.00235572])
+2: NORM/{'NORM': 80.0, 'SBRAD': 0.0} ([0.9962979  0.00467914])
+3: NORM/{'NORM': 100.0, 'SR': 0.0} ([0.99648595 0.00317666])
+4: NORM/{'NORM': 100.0, 'SR': 0.0} ([0.9967481  0.00303471])
+21300: NORM/{'LAFB': 100.0, 'NST_': 100.0, 'AFIB': 0.0} ([0.7834729  0.20178199])
+21500: NORM/{'NDT': 100.0, 'SR': 0.0} ([0.95101833 0.04299882])

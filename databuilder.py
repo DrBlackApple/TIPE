@@ -1,7 +1,6 @@
 import ast
 import numpy as np
 import wfdb
-import numba
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 import os
@@ -30,7 +29,8 @@ def loadSample(path:str, df: pd.DataFrame, samplerate=100):
     raw = []
     metas = []
     for signal, meta in data:
-        raw.append(np.array(signal).flatten(order='F').reshape(meta['n_sig'], meta['sig_len']))
+        #raw.append(np.array(signal).flatten(order='F').reshape(meta['n_sig'], meta['sig_len']))
+        raw.append(signal)
         metas.append(meta)
     return (np.array(raw), np.array(metas))
 
@@ -41,7 +41,7 @@ def loadStatement(csv:str):
     df = pd.read_csv(csv, index_col=None)
     return df
 
-def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='cache/', use_only_diag=True) -> np.array:
+def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='./', use_only_diag=True, use_most=-1):
     """One-hot encode les diagnostics -> un vecteur de dimension 71 pour chaque diag
         Sauvergarde l'encodeur pour décoder la prédiction
 
@@ -59,8 +59,23 @@ def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='cache/', use
     if use_only_diag:
         statement = statement[statement.diagnostic == 1]
 
+    #create list of most 'used' labels and take use_most of them
+    only_labels=[]
+    if use_most > 0:
+        freq = {}
+        for codes in db.scp_codes:
+            mk = max(codes, key=codes.get)
+            if mk in freq:
+                freq[mk] += 1
+            else:
+                freq[mk] = 1
+        freq = sorted(freq.items(), key=lambda item: item[1], reverse=True)
+        for i in range(use_most):
+            only_labels.append(freq[i][0])
+        only_labels.append('OTHER')
+
     enc = OneHotEncoder()
-    labels = statement['code'].to_numpy()
+    labels = statement.iloc[:,0].to_numpy() if not only_labels else np.array(only_labels)
     enc.fit(labels.reshape(-1, 1))
 
     joblib.dump(enc, save_dir+'encoder.save')
@@ -68,43 +83,21 @@ def createYArray(statement:pd.DataFrame, db:pd.DataFrame, save_dir='cache/', use
     Y = []
     for codes in db.scp_codes:
         tmp = np.zeros(len(labels))
-        for key in codes.keys():
-            if key in labels:
-                tmp = np.add(tmp, enc.transform([[key]]).toarray()[0] * codes[key] / 100)
+        max_key = max(codes, key=codes.get)
+        if max_key in labels:
+            tmp = np.add(tmp, enc.transform([[max_key]]).toarray()[0])
+        else:
+            tmp = np.add(tmp, enc.transform([['OTHER']]).toarray()[0])
+        #for key in codes.keys():
+        #    if key in labels:
+        #        tmp = np.add(tmp, enc.transform([[key]]).toarray()[0] * codes[key] / 100)
+        #    else:
+        #        tmp += enc.transform([['NORM']])
         Y.append(tmp)
 
     return np.array(Y)
 
-def normalize(samples:np.array, metas:np.array, save_dir='cache/', use_existing=False) -> np.array:
-    """Normalise les donnés avec MinMaxScaler
-
-    Args:
-        samples (np.array): les samples
-        metas (np.array): les métadonnés
-        save_dir (str, optional): le dossier de sauvegarde. Defaults to 'cache/'.
-        use_existing (bool, optional): Utilise ou non la sauvegarde. Defaults to False.
-
-    Returns:
-        np.array: les samples normalisés entre 0 et 1
-    """
-
-    names = metas[0]['sig_name']
-    for i in range(len(names)):
-        data = samples[i,:]
-
-        file = save_dir+'scaler_'+names[i]+'.save'
-
-        if use_existing:
-            scaler = joblib.load(file)
-            scaler.transform(data)
-        else:
-            scaler = MinMaxScaler(copy=False)
-            scaler.fit_transform(data)
-            joblib.dump(scaler, file)
-
-    return samples
-
-def collectData(db_dir, samples_file, metas_file, y_file, use_saved=True):
+def collectData(db_dir, samples_file, metas_file, y_file, use_saved=True, use_most=-1):
     """Charge les données à partir de celles sauvergardés ou en les créant
 
     Args:
@@ -121,18 +114,18 @@ def collectData(db_dir, samples_file, metas_file, y_file, use_saved=True):
     stat = loadStatement(db_dir + 'scp_statements.csv')
 
     # Charge les données déjà traitées si elles existent
+
     if use_saved and os.path.exists(samples_file):
         print('Chargement des données ', end='', flush=True)
+
         samples = joblib.load(samples_file)
         metas = joblib.load(metas_file)
         Y = joblib.load(y_file)
         print('[OK]')
     else:
         print('Création des données ', end='', flush=True)
-        samples, metas = loadSample('data/', db)
-        #samples = normalize(samples, metas)
-        Y = createYArray(stat, db)
-
+        samples, metas = loadSample(db_dir, db)
+        Y = createYArray(stat, db, use_most=use_most)
         joblib.dump(samples, samples_file, compress=3)
         joblib.dump(metas, metas_file)
         joblib.dump(Y, y_file, compress=3)

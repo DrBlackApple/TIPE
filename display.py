@@ -1,9 +1,7 @@
-import tensorflow as tf
-from tensorflow import keras
 import matplotlib.pyplot as plt
-import header as h
+import numpy as np
 
-class CallbackDisplay(keras.callbacks.Callback):
+class CallbackDisplay():
 
     def on_train_begin(self, logs=None):
         fig, self.ax1 = plt.subplots()
@@ -36,17 +34,19 @@ class CallbackDisplay(keras.callbacks.Callback):
         self.ax1.legend(loc='upper left')
         plt.show()
 
-
-def showHistory(hist:h.keras.callbacks.History, save=True):
+def showHistory(hist, save=True):
     fig, ax = plt.subplots(1,1)
     ax.plot(hist.history['loss'], label='Loss')
     ax.plot(hist.history['accuracy'], label='Accuracy')
     ax.legend()
     plt.show()
 
-def showECG(ecg:h.np.ndarray, meta:dict):
+def showECG(ecg:np.ndarray, meta:dict):
     fig, axs = plt.subplots(meta['n_sig'], sharex=True, sharey=True)
+    plt.xlabel('Temps (ms)')
     for i in range(meta['n_sig']):
         axs[i].plot(ecg[i], 'r-')
         axs[i].set_title(meta['sig_name'][i])
+        if i == meta['n_sig'] // 2:
+            axs[i].set_ylabel('Amplitude (µV)')
     plt.show()

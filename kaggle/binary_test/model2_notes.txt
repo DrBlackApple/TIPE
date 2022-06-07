@@ -1,0 +1,20 @@
+[0.4120556712150574, 0.8470696210861206]
+
+Apprends beaucoup plus vite (20 époques)
+Plus d'accuracy sur le validation
+
+Des valeurs beaucoups plus cohérents (best modèles) :
+1: NORM/{'NORM': 100.0, 'LVOLT': 0.0, 'SR': 0.0} ([0.8020171  0.19980145])
+2: NORM/{'NORM': 80.0, 'SBRAD': 0.0} ([0.9762832 0.0252831])
+3: NORM/{'NORM': 100.0, 'SR': 0.0} ([0.80898035 0.19764411])
+4: NORM/{'NORM': 100.0, 'SR': 0.0} ([0.80207014 0.2127003 ])
+21300: OTHER/{'LAFB': 100.0, 'NST_': 100.0, 'AFIB': 0.0} ([2.4965493e-11 1.0000000e+00])
+21500: OTHER/{'NDT': 100.0, 'SR': 0.0} ([0.37960273 0.68167424])
+
+Environ 400000 paramètre entrainables
+
+
+Modèle 3 multi entrée :
+
+70% de précision
+99% de précision pendant l'entraînement

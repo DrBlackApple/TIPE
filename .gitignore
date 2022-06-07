@@ -3,3 +3,8 @@ data/*
 cache/*
 *.pem
 logs/*
+*.hdf5
+*.dat
+*.pdf
+diapo/*
+screen/*

@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
-import header as h
-
-def euclidian_distance(y_true, y_pred):
-    return h.tf.math.reduce_euclidean_norm(y_true - y_pred)
+from header import *
 
 """
     ########### Modèle ############
 """
 
-N_EPOCH = 30
-model = h.keras.Sequential([
-    h.keras.layers.Dense(500,input_shape=(h.metas[0]['n_sig'], h.metas[0]['sig_len']), activation='relu'),
-    h.keras.layers.BatchNormalization(),
-    h.keras.layers.Dropout(0.2),
-    h.keras.layers.Dense(128, activation='relu'),
-    h.keras.layers.BatchNormalization(),
-    h.keras.layers.Flatten(),
-    h.keras.layers.Dense(256, activation='relu'),
-    h.keras.layers.BatchNormalization(),
-    h.keras.layers.Dropout(0.2),
-    h.keras.layers.Dense(len(h.Y_train[0]), activation='sigmoid'),
+m = keras.Sequential([
+        Dense(12, input_shape=(1000, 12), activation='relu'),
+        BatchNormalization(),
+        Dense(3, activation='relu'),
+        BatchNormalization(),
+        Flatten(),
+        Dense(3, activation='relu'),
+        BatchNormalization(),
+        Dropout(0.1),
+        Dense(12, activation='relu'),
+        BatchNormalization(),
+        Dropout(0.1),
+        Dense(len(Y_train[0]), activation='softmax')
 ])
 
-model.summary()
+m.summary()
+#keras.utils.plot_model(m, 'model.png', show_shapes=True)
+m.compile(optimizer=opt, loss=lss, metrics=['accuracy'])
+m.fit(X_train, Y_train, batch_size=len(X_train), epochs=N_EPOCH, validation_data=(X_val,Y_val), callbacks=cb)
+hist = m.evaluate(X_test, Y_test)
+#print(hist)
+#joblib.dump(hist, 'hist_graph.dat')
+#m.save('model_final.hdf5')
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-hist = model.fit(h.X_train, h.Y_train, epochs=N_EPOCH)
-
-h.display.showHistory(hist)
-
-print(model.predict(h.X_test[0].reshape(1, 12, 1000)), h.Y_test[0])
+print(m.predict(X_test[0].reshape((1, 1000, 12))), Y_test[0])
